@@ -15,6 +15,5 @@ output "pages_project_subdomain" {
 
 output "custom_domains" {
   description = "Custom domains attached to the Cloudflare Pages project."
-  value       = cloudflare_pages_domain.custom[*].domain
-  depends_on  = [cloudflare_pages_domain.custom]
+  value       = [for domain in cloudflare_pages_domain.custom : domain.domain]
 }
