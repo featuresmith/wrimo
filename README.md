@@ -1,2 +1,7 @@
-# wrimo
-The global writing competition where the reward is your own book.
+# Wrimo
+
+The global writing challenge where the reward is your own book.
+
+## Development
+
+The site is a simple static HTML page. Edit `index.html` and push to `main` to deploy.
