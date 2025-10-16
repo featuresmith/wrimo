@@ -1,4 +1,4 @@
-# Wrimo – write more!
+# Wrimo – Write more!
 
 The global writing challenge where the reward is your own book.
 
