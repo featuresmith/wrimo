@@ -1,0 +1,14 @@
+cloudflare_account_id   = "00000000000000000000000000000000"
+cloudflare_api_token    = "cf-api-token"
+repo_owner              = "your-github-username"
+repo_name               = "wrimo"
+project_name            = "wrimo"
+production_branch       = "main"
+compatibility_date      = "2024-05-01"
+production_env_vars = {
+  # EXAMPLE_KEY = "value"
+}
+
+custom_domains = [
+  "wrimo.io",
+]
