@@ -9,7 +9,6 @@ resource "cloudflare_pages_project" "wrimo" {
   deployment_configs {
     production {
       compatibility_date = var.compatibility_date
-      env_vars           = var.production_env_vars
     }
   }
 }
