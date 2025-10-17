@@ -1,0 +1,39 @@
+# Dependencies
+node_modules/
+pnpm-debug.log*
+.pnpm-store/
+
+# Build outputs
+dist/
+dist-ssr/
+*.local
+
+# Editor directories and files
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.DS_Store
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# OpenTofu
+infra/.tofu/
+infra/*.tfstate
+infra/*.tfstate.*
+infra/.tofu.lock.hcl
+infra/terraform.tfvars
+
+# Logs
+logs/
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
