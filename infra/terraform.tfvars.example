@@ -1,14 +1,16 @@
-cloudflare_account_id   = "00000000000000000000000000000000"
-cloudflare_api_token    = "cf-api-token"
-repo_owner              = "your-github-username"
-repo_name               = "wrimo"
-project_name            = "wrimo"
-production_branch       = "main"
-compatibility_date      = "2024-05-01"
+cloudflare_account_id = "00000000000000000000000000000000"
+cloudflare_api_token  = "your-cloudflare-api-token-here"
+project_name          = "wrimo"
+production_branch     = "main"
+compatibility_date    = "2024-05-01"
+
+# Optional: Additional environment variables for production
 production_env_vars = {
-  # EXAMPLE_KEY = "value"
+  # EXAMPLE_KEY = "example_value"
 }
 
+# Optional: Custom domains to attach to the Pages project
 custom_domains = [
-  "wrimo.io",
+  # "wrimo.io",
+  # "www.wrimo.io",
 ]

@@ -6,16 +6,11 @@ resource "cloudflare_pages_project" "wrimo" {
   # No source block - deployments are handled via GitHub Actions using cloudflare/pages-action
   # This creates the Pages project infrastructure only
 
-  deployment_configs {
-    production {
-      compatibility_date = var.compatibility_date
-    }
-  }
 }
 
 resource "cloudflare_pages_domain" "custom" {
-  for_each      = toset(var.custom_domains)
-  account_id    = var.cloudflare_account_id
-  project_name  = cloudflare_pages_project.wrimo.name
-  domain        = each.value
+  for_each     = toset(var.custom_domains)
+  account_id   = var.cloudflare_account_id
+  project_name = cloudflare_pages_project.wrimo.name
+  domain       = each.value
 }
