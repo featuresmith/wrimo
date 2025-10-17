@@ -1,0 +1,21 @@
+{
+  "name": "wrimo",
+  "version": "1.0.0",
+  "description": "The global writing challenge where the reward is your own book",
+  "type": "module",
+  "packageManager": "pnpm@9.15.0",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "vite": "^6.0.1"
+  },
+  "keywords": [
+    "writing",
+    "challenge",
+    "novel"
+  ],
+  "author": "Featuresmith"
+}
