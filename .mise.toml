@@ -1,0 +1,32 @@
+[tools]
+node = "25"
+opentofu = "1.8"
+pnpm = "9"
+
+[tasks.install]
+description = "Install project dependencies"
+run = "pnpm install"
+
+[tasks.dev]
+description = "Start the development server"
+run = "pnpm dev"
+
+[tasks.build]
+description = "Build the site for production"
+run = "pnpm build"
+
+[tasks.preview]
+description = "Preview the production build locally"
+run = "pnpm preview"
+
+[tasks.tf-init]
+description = "Initialize OpenTofu"
+run = "cd infra && tofu init"
+
+[tasks.tf-plan]
+description = "Plan OpenTofu changes"
+run = "cd infra && tofu plan"
+
+[tasks.tf-apply]
+description = "Apply OpenTofu changes"
+run = "cd infra && tofu apply"
