@@ -12,10 +12,11 @@ worker_secrets = {
   # EXAMPLE_KEY = "value"
 }
 
-custom_domains = {
-  "wrimo.io" = {
-    zone = "wrimo.io"
-    # zone_id     = "00000000000000000000000000000000"
-    # environment = "production"
-  }
-}
+# Zone that owns the Worker domains. Required when custom_domains is non-empty.
+cloudflare_zone_id = "00000000000000000000000000000000"
+
+# Provide hostnames to bind to the Worker. Set to [] or null to disable.
+custom_domains = [
+  "wrimo.io",
+  # "www.wrimo.io",
+]

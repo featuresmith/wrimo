@@ -39,19 +39,50 @@ variable "worker_secrets" {
 }
 
 variable "custom_domains" {
-  description = "Custom domains to attach to the Cloudflare Worker script. Keys are hostnames; values may provide either a zone identifier or name plus an optional environment."
-  type = map(object({
-    zone        = optional(string)
-    zone_id     = optional(string)
-    environment = optional(string)
-  }))
-  default = {}
+  description = "List of custom domain hostnames to attach to the Cloudflare Worker script. Set to [] or null to disable."
+  type        = list(string)
+  default     = []
+  nullable    = true
 
   validation {
-    condition = alltrue([
-      for domain, config in var.custom_domains :
-      try(config.zone_id != null && config.zone_id != "", false) || try(config.zone != null && config.zone != "", false)
-    ])
-    error_message = "Each custom domain must supply either zone_id or zone."
+    condition     = var.custom_domains == null || alltrue([for hostname in var.custom_domains : trimspace(hostname) != ""])
+    error_message = "Custom domain hostnames must be non-empty strings."
+  }
+}
+
+variable "cloudflare_zone_id" {
+  description = "Cloudflare zone identifier applied to each custom domain hostname."
+  type        = string
+  default     = null
+
+  validation {
+    condition     = var.cloudflare_zone_id == null || trimspace(var.cloudflare_zone_id) != ""
+    error_message = "cloudflare_zone_id must be a non-empty string when set."
+  }
+}
+
+locals {
+  custom_domain_hostnames = (
+    var.custom_domains == null
+    ? []
+    : [
+      for hostname in var.custom_domains :
+      trimspace(hostname)
+      if trimspace(hostname) != ""
+    ]
+  )
+
+  default_custom_domain_zone_id = (
+    trimspace(try(var.cloudflare_zone_id, "")) != ""
+    ? trimspace(var.cloudflare_zone_id)
+    : null
+  )
+
+  custom_domains = {
+    for hostname in toset(local.custom_domain_hostnames) :
+    hostname => {
+      zone_id     = local.default_custom_domain_zone_id
+      environment = "production"
+    }
   }
 }
