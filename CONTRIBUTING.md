@@ -100,18 +100,26 @@ brew install mise
    mise run build
    ```
 
-8. **Commit your changes:**
+8. **Preview the Worker locally** (optional):
+   ```bash
+   pnpm build
+   npx wrangler dev --assets dist
+   ```
+
+   This runs the Worker at http://localhost:8787 using the production bundle.
+
+9. **Commit your changes:**
    ```bash
    git add .
    git commit -m "Add: brief description of your changes"
    ```
 
-9. **Push to your fork:**
+10. **Push to your fork:**
    ```bash
    git push origin feature/your-feature-name
    ```
 
-10. **Open a Pull Request** on GitHub
+11. **Open a Pull Request** on GitHub
 
 ## Development Tools
 
@@ -130,6 +138,8 @@ This project uses modern development tools:
 mise run dev          # Start dev server (http://localhost:5173)
 mise run build        # Build for production
 mise run preview      # Preview production build
+pnpm build && \
+  npx wrangler dev --assets dist  # Run Worker preview (http://localhost:8787)
 
 # Infrastructure (maintainers only)
 mise run tf-init      # Initialize OpenTofu
@@ -172,18 +182,18 @@ wrimo/
 ├── package.json           # Node.js dependencies
 ├── .mise.toml             # Development tool versions
 ├── .github/workflows/     # CI/CD automation
-│   ├── infra.yml          # Cloudflare Pages deployment
+│   ├── infra.yml          # Wrangler Worker deployment
 │   └── auto-merge.yml     # Auto-merge PRs
 └── infra/                 # Infrastructure as code
     ├── providers.tf       # OpenTofu providers
-    ├── pages_project.tf   # Cloudflare Pages config
+    ├── worker.tf          # Cloudflare Worker config
     ├── variables.tf       # Variable definitions
     └── outputs.tf         # Output definitions
 ```
 
 ## Deployment
 
-The site is automatically deployed to Cloudflare Pages when changes are merged to `main`. You don't need to worry about deployment - just focus on your changes!
+The site is automatically deployed as a Cloudflare Worker when changes are merged to `main`. The Wrangler workflow handles the deployment, so you can focus on your changes!
 
 ## Questions?
 
