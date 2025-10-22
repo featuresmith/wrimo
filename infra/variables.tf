@@ -56,6 +56,7 @@ variable "custom_domains" {
     condition     = var.custom_domains == null || alltrue([for hostname in var.custom_domains : trimspace(hostname) != ""])
     error_message = "Custom domain hostnames must be non-empty strings."
   }
+
 }
 
 variable "cloudflare_zone_id" {

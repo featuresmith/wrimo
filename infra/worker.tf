@@ -1,15 +1,33 @@
 locals {
-  worker_secret_keys = toset(
-    keys(
-      coalesce(
-        nonsensitive(var.worker_secrets),
-        tomap({})
-      )
-    )
+  worker_secret_map = (
+    var.worker_secrets != null
+    ? var.worker_secrets
+    : tomap({})
   )
+
+  worker_secret_bindings = [
+    for name, value in local.worker_secret_map : {
+      name = name
+      type = "secret_text"
+      text = value
+    }
+  ]
+
+  worker_secret_names = sort(keys(local.worker_secret_map))
 
   worker_main_module_path = abspath("${path.module}/${var.worker_main_module_path}")
   worker_assets_directory = abspath("${path.module}/${var.worker_assets_directory}")
+}
+
+check "custom_domains_require_zone_id" {
+  assert {
+    condition = (
+      length(local.custom_domains) == 0 ||
+      trimspace(try(var.cloudflare_zone_id, "")) != ""
+    )
+
+    error_message = "Set cloudflare_zone_id when providing custom_domains."
+  }
 }
 
 resource "cloudflare_worker" "worker" {
@@ -26,6 +44,12 @@ resource "cloudflare_worker_version" "current" {
   assets = {
     directory = local.worker_assets_directory
   }
+
+  bindings = (
+    length(local.worker_secret_bindings) > 0
+    ? local.worker_secret_bindings
+    : null
+  )
 
   modules = [{
     name         = var.worker_main_module_name
@@ -45,13 +69,13 @@ resource "cloudflare_workers_deployment" "production" {
   }]
 }
 
-resource "cloudflare_workers_domain" "custom" {
+resource "cloudflare_workers_custom_domain" "custom" {
   for_each    = local.custom_domains
   account_id  = var.cloudflare_account_id
   hostname    = each.key
   service     = cloudflare_worker.worker.name
   environment = lookup(each.value, "environment", "production")
-  zone_id     = lookup(each.value, "zone_id", null)
+  zone_id     = trimspace(try(each.value.zone_id, ""))
 
   lifecycle {
     precondition {
@@ -59,13 +83,4 @@ resource "cloudflare_workers_domain" "custom" {
       error_message = "Set cloudflare_zone_id when providing custom_domains."
     }
   }
-}
-
-resource "cloudflare_workers_secret" "worker" {
-  for_each = { for name in local.worker_secret_keys : name => name }
-
-  account_id  = var.cloudflare_account_id
-  name        = each.key
-  script_name = cloudflare_worker.worker.name
-  secret_text = var.worker_secrets[each.key]
 }

@@ -16,7 +16,7 @@ output "worker_version_id" {
 output "worker_domains" {
   description = "Custom domains attached to the Cloudflare Worker script, keyed by hostname."
   value = {
-    for hostname, domain in cloudflare_workers_domain.custom :
+    for hostname, domain in cloudflare_workers_custom_domain.custom :
     hostname => {
       zone_id     = domain.zone_id
       environment = domain.environment
@@ -26,6 +26,6 @@ output "worker_domains" {
 
 output "worker_secret_names" {
   description = "Secrets managed for the Cloudflare Worker script."
-  value       = [for name in keys(cloudflare_workers_secret.worker) : name]
+  value       = local.worker_secret_names
   sensitive   = true
 }
