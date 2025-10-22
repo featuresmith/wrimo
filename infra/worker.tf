@@ -33,9 +33,12 @@ resource "cloudflare_workers_domain" "custom" {
 
 locals {
   worker_secret_keys = toset(
-    var.worker_secrets == null
-    ? []
-    : nonsensitive(keys(var.worker_secrets))
+    keys(
+      coalesce(
+        nonsensitive(var.worker_secrets),
+        tomap({})
+      )
+    )
   )
 }
 
