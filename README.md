@@ -4,7 +4,7 @@ The global writing challenge where the reward is your own book.
 
 ## Overview
 
-Wrimo is a statically generated site served by a Cloudflare Worker. The UI is built with Vite, and the Worker streams the built assets that live in Cloudflare's Worker asset storage. GitHub Actions uses Wrangler to publish the production Worker, while Spacelift applies the OpenTofu stack that provisions the Worker shell, secrets, and custom domains in Cloudflare.
+Wrimo is a statically generated site served by a Cloudflare Worker. The UI is built with Vite, and the Worker streams the built assets that live in Cloudflare's Worker asset storage. Spacelift executes the OpenTofu stack, which provisions the Worker shell, secrets, custom domains, and now uploads the Worker module and static assets using Terraform's `cloudflare_worker_version` resource.
 
 ## Development
 
@@ -40,32 +40,29 @@ This serves the Worker at http://localhost:8787 using the same bundle the deploy
 
 ## Deployment
 
-Deployments are automated via GitHub Actions. Pushing to `main` triggers the Wrangler workflow (`.github/workflows/infra.yml`), which runs `pnpm build` followed by `npx wrangler deploy --assets dist` to publish the Worker and its static assets to Cloudflare.
+Deployments are now driven entirely by Spacelift. When changes land on `main`, the Spacelift stack builds the site (`pnpm build`) and then applies the OpenTofu configuration. Terraform uploads the Worker module and static assets through the `cloudflare_worker_version` resource and immediately promotes that version via `cloudflare_workers_deployment`, so no separate Wrangler deployment step is required.
 
-### Wrangler workflow and manifest
+Because Terraform reads the build artifacts directly from `dist/`, always run `pnpm build` before executing `mise run tf-plan` or `mise run tf-apply` locally. The Spacelift pipeline performs the same build step automatically before applying.
 
-The repository includes a `wrangler.toml` manifest so Wrangler can deploy the Worker and upload the static build output (`dist/`) as Worker assets. Wrangler reads the account identifier from the `CLOUDFLARE_ACCOUNT_ID` environment variable, so export it locally (for example `export CLOUDFLARE_ACCOUNT_ID=...`) or configure it in CI before running `pnpm wrangler ...` commands.
+### Terraform-managed Worker bundle
 
-### Required GitHub Secrets
+- `worker/index.js` defines the Worker module that proxies requests to the static asset storage exposed by Cloudflare.
+- The Terraform stack reads that module (via `worker_main_module_path`) and the compiled static assets in `dist/` (via `worker_assets_directory`).
+- `cloudflare_worker_version` uploads both the module and the assets, allowing Terraform to detect and publish changes without a custom CI job.
+- `cloudflare_workers_deployment` pins 100% of traffic to the most recent version so deployments remain declarative.
 
-To enable automated deployments, configure the following secrets in your GitHub repository settings (Settings → Secrets and variables → Actions):
+### Spacelift stack configuration
 
-- `CLOUDFLARE_API_TOKEN` – Cloudflare API token Wrangler uses to publish the Worker and upload assets
-  - Create at: https://dash.cloudflare.com/profile/api-tokens
-  - Required permissions:
-    - Account → Workers Scripts → Edit
-    - Account → Workers KV Storage → Edit (required for Worker assets)
-    - Account → Workers Routes → Edit (needed if Wrangler manages service bindings)
-- `CLOUDFLARE_ACCOUNT_ID` – Your Cloudflare account ID
-  - Find in: Cloudflare Dashboard → Any site → Overview (in the right sidebar)
+Configure the Spacelift stack with the following environment variables or context:
 
-### GitHub Environment Setup
+- `CLOUDFLARE_API_TOKEN` – API token with Workers:Edit and Workers KV:Edit permissions so Terraform can upload the Worker and assets.
+- `CLOUDFLARE_ACCOUNT_ID` – Cloudflare account identifier used by the provider.
 
-The deployment workflow uses a `Production` environment for additional protection:
+Additional secrets (for example Worker secret values) continue to live in Spacelift and flow into Terraform via `worker_secrets`.
 
-1. Go to Settings → Environments → New environment
-2. Create an environment named `Production`
-3. (Optional) Add protection rules like required reviewers
+### Wrangler manifest for local preview
+
+`wrangler.toml` remains in the repository so you can preview the Worker locally. After running `pnpm build`, execute `npx wrangler dev --assets dist` to serve the site from your machine using the same asset directory Terraform will upload.
 
 ## Infrastructure
 
@@ -84,6 +81,8 @@ Infrastructure is managed via OpenTofu in the `infra/` directory and executed th
    - `cloudflare_api_token` - API token with appropriate permissions
    - `cloudflare_zone_id` - Zone ID that owns the Worker domains (required when `custom_domains` is non-empty)
    - `custom_domains` - List of hostnames to attach to the Worker (set to `[]` or `null` if none)
+   - `worker_main_module_path` - Path to the Worker module (`../worker/index.js` by default)
+   - `worker_assets_directory` - Path to the static asset build output (`../dist`, generated by `pnpm build`)
 
 3. Initialize and apply:
    ```bash

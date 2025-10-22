@@ -1,11 +1,16 @@
 output "worker_script_id" {
-  description = "Identifier of the Cloudflare Worker script."
-  value       = cloudflare_workers_script.worker.id
+  description = "Identifier of the Cloudflare Worker."
+  value       = cloudflare_worker.worker.id
 }
 
 output "worker_script_name" {
-  description = "Name of the Cloudflare Worker script."
-  value       = cloudflare_workers_script.worker.name
+  description = "Name of the Cloudflare Worker."
+  value       = cloudflare_worker.worker.name
+}
+
+output "worker_version_id" {
+  description = "Identifier of the active Worker version uploaded by Terraform."
+  value       = cloudflare_worker_version.current.id
 }
 
 output "worker_domains" {

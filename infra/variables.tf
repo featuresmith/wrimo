@@ -15,20 +15,28 @@ variable "worker_name" {
   default     = "wrimo"
 }
 
-variable "worker_script" {
-  description = "Initial Worker script content. The deployment pipeline should update this after the script is created."
-  type        = string
-  default     = <<-EOT
-  addEventListener("fetch", event => {
-    event.respondWith(new Response("Wrimo Worker placeholder", { status: 200 }));
-  });
-  EOT
-}
-
 variable "worker_compatibility_date" {
   description = "Cloudflare Workers compatibility date for the Worker."
   type        = string
-  default     = "2024-05-01"
+  default     = "2024-10-11"
+}
+
+variable "worker_main_module_name" {
+  description = "Name of the Worker module that exports the fetch handler."
+  type        = string
+  default     = "index.js"
+}
+
+variable "worker_main_module_path" {
+  description = "Path to the Worker module file relative to the infra directory."
+  type        = string
+  default     = "../worker/index.js"
+}
+
+variable "worker_assets_directory" {
+  description = "Directory containing the static assets to upload with the Worker version."
+  type        = string
+  default     = "../dist"
 }
 
 variable "worker_secrets" {
