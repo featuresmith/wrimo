@@ -31,11 +31,19 @@ resource "cloudflare_workers_domain" "custom" {
   )
 }
 
+locals {
+  worker_secret_keys = toset(
+    keys(
+      coalesce(
+        nonsensitive(var.worker_secrets),
+        tomap({})
+      )
+    )
+  )
+}
+
 resource "cloudflare_workers_secret" "worker" {
-  for_each = var.worker_secrets == null ? {} : {
-    for name in nonsensitive(keys(var.worker_secrets)) :
-    name => name
-  }
+  for_each = { for name in local.worker_secret_keys : name => name }
 
   account_id  = var.cloudflare_account_id
   name        = each.key
