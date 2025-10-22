@@ -31,6 +31,10 @@ The site is a simple static HTML page. To work on it locally:
 
 Deployments are automated via GitHub Actions. When you push to `main`, the site is automatically deployed to Cloudflare Pages.
 
+### Wrangler manifest
+
+The repository includes a `wrangler.toml` manifest so the static build output (`dist/`) can be deployed with Cloudflare Workers when needed. Wrangler reads the account identifier from the `CLOUDFLARE_ACCOUNT_ID` environment variable, so export it locally (for example `export CLOUDFLARE_ACCOUNT_ID=...`) or configure it in CI before running `pnpm wrangler ...` commands.
+
 ### Required GitHub Secrets
 
 To enable automated deployments, configure the following secrets in your GitHub repository settings (Settings → Secrets and variables → Actions):
