@@ -14,7 +14,7 @@ output "worker_domains" {
     for hostname, domain in cloudflare_workers_domain.custom :
     hostname => {
       zone_id     = domain.zone_id
-      zone_name   = lookup(var.custom_domains[hostname], "zone", null)
+      zone_name   = lookup(local.custom_domains[hostname], "zone", null)
       environment = domain.environment
     }
   }

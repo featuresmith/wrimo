@@ -82,7 +82,7 @@ Infrastructure is managed via OpenTofu in the `infra/` directory and executed th
 2. Edit `terraform.tfvars` with your actual values:
    - `cloudflare_account_id` - Your Cloudflare account ID
    - `cloudflare_api_token` - API token with appropriate permissions
-   - `custom_domains` - List of custom domains (if any)
+   - `custom_domains` - Map of custom domains keyed by hostname (set to `{}`, `[]`, or `null` if none)
 
 3. Initialize and apply:
    ```bash

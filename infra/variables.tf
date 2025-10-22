@@ -39,19 +39,38 @@ variable "worker_secrets" {
 }
 
 variable "custom_domains" {
-  description = "Custom domains to attach to the Cloudflare Worker script. Keys are hostnames; values may provide either a zone identifier or name plus an optional environment."
-  type = map(object({
-    zone        = optional(string)
-    zone_id     = optional(string)
-    environment = optional(string)
-  }))
-  default = {}
+  description = "Custom domains to attach to the Cloudflare Worker script. Provide a map keyed by hostname with a zone identifier or zone name and optional environment. Set to null, {}, or [] to disable custom domains."
+  type        = any
+  default     = null
 
   validation {
-    condition = alltrue([
-      for domain, config in var.custom_domains :
-      try(config.zone_id != null && config.zone_id != "", false) || try(config.zone != null && config.zone != "", false)
-    ])
-    error_message = "Each custom domain must supply either zone_id or zone."
+    condition = (
+      var.custom_domains == null ||
+      (
+        can(tomap(var.custom_domains)) &&
+        alltrue([
+          for _, config in tomap(var.custom_domains) :
+          (
+            try(trimspace(config.zone_id), "") != "" ||
+            try(trimspace(config.zone), "") != ""
+          )
+        ])
+      ) ||
+      (
+        can(tolist(var.custom_domains)) &&
+        try(length(tolist(var.custom_domains)), 0) == 0
+      )
+    )
+    error_message = "Custom domains must be provided as a hostname-keyed map with a zone_id or zone, or left empty."
   }
+}
+
+locals {
+  custom_domains = (
+    var.custom_domains == null
+    ? {}
+    : can(tomap(var.custom_domains))
+    ? tomap(var.custom_domains)
+    : {}
+  )
 }
