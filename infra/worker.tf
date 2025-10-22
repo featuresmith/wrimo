@@ -32,9 +32,13 @@ resource "cloudflare_workers_domain" "custom" {
 }
 
 resource "cloudflare_workers_secret" "worker" {
-  for_each    = var.worker_secrets
+  for_each = var.worker_secrets == null ? {} : {
+    for name in nonsensitive(keys(var.worker_secrets)) :
+    name => name
+  }
+
   account_id  = var.cloudflare_account_id
   name        = each.key
   script_name = cloudflare_workers_script.worker.name
-  secret_text = each.value
+  secret_text = var.worker_secrets[each.key]
 }
