@@ -19,3 +19,10 @@ custom_domains = {
     # environment = "production"
   }
 }
+
+# Alternatively, set a default zone and provide hostnames as a list:
+# custom_domain_default_zone = "wrimo.io"
+# custom_domains = [
+#   "wrimo.io",
+#   # { hostname = "www.wrimo.io", environment = "production" }
+# ]
