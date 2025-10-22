@@ -1,19 +1,27 @@
-output "pages_project_id" {
-  description = "Identifier of the Cloudflare Pages project."
-  value       = cloudflare_pages_project.wrimo.id
+output "worker_script_id" {
+  description = "Identifier of the Cloudflare Worker script."
+  value       = cloudflare_workers_script.worker.id
 }
 
-output "pages_project_name" {
-  description = "Name of the Cloudflare Pages project."
-  value       = cloudflare_pages_project.wrimo.name
+output "worker_script_name" {
+  description = "Name of the Cloudflare Worker script."
+  value       = cloudflare_workers_script.worker.name
 }
 
-output "pages_project_subdomain" {
-  description = "Default Cloudflare Pages subdomain for the project."
-  value       = cloudflare_pages_project.wrimo.subdomain
+output "worker_domains" {
+  description = "Custom domains attached to the Cloudflare Worker script, keyed by hostname."
+  value = {
+    for hostname, domain in cloudflare_workers_domain.custom :
+    hostname => {
+      zone_id     = domain.zone_id
+      zone_name   = lookup(var.custom_domains[hostname], "zone", null)
+      environment = domain.environment
+    }
+  }
 }
 
-output "custom_domains" {
-  description = "Custom domains attached to the Cloudflare Pages project."
-  value       = [for domain in cloudflare_pages_domain.custom : domain.domain]
+output "worker_secret_names" {
+  description = "Secrets managed for the Cloudflare Worker script."
+  value       = [for name in keys(cloudflare_workers_secret.worker) : name]
+  sensitive   = true
 }
