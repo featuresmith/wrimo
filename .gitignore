@@ -25,6 +25,7 @@ dist-ssr/
 
 # OpenTofu
 infra/.tofu/
+infra/.terraform/
 infra/*.tfstate
 infra/*.tfstate.*
 infra/.tofu.lock.hcl
