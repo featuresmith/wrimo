@@ -1,14 +1,21 @@
-cloudflare_account_id   = "00000000000000000000000000000000"
-cloudflare_api_token    = "cf-api-token"
-repo_owner              = "your-github-username"
-repo_name               = "wrimo"
-project_name            = "wrimo"
-production_branch       = "main"
-compatibility_date      = "2024-05-01"
-production_env_vars = {
+cloudflare_account_id = "00000000000000000000000000000000"
+cloudflare_api_token  = "cf-api-token"
+worker_name           = "wrimo"
+worker_script = <<-EOT
+addEventListener("fetch", event => {
+  event.respondWith(new Response("Wrimo Worker placeholder", { status: 200 }));
+});
+EOT
+worker_compatibility_date = "2024-05-01"
+
+worker_secrets = {
   # EXAMPLE_KEY = "value"
 }
 
-custom_domains = [
-  "wrimo.io",
-]
+custom_domains = {
+  "wrimo.io" = {
+    zone = "wrimo.io"
+    # zone_id     = "00000000000000000000000000000000"
+    # environment = "production"
+  }
+}
