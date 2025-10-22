@@ -9,26 +9,20 @@ resource "cloudflare_workers_script" "worker" {
   }
 }
 
-data "cloudflare_zone" "custom" {
-  for_each = {
-    for hostname, config in local.custom_domains :
-    hostname => config
-    if try(config.zone_id, null) == null
-  }
-
-  name = lookup(each.value, "zone", null)
-}
-
 resource "cloudflare_workers_domain" "custom" {
   for_each    = local.custom_domains
   account_id  = var.cloudflare_account_id
   hostname    = each.key
   service     = cloudflare_workers_script.worker.name
-  environment = try(each.value.environment, "production")
-  zone_id = coalesce(
-    try(each.value.zone_id, null),
-    try(data.cloudflare_zone.custom[each.key].id, null),
-  )
+  environment = lookup(each.value, "environment", "production")
+  zone_id     = lookup(each.value, "zone_id", null)
+
+  lifecycle {
+    precondition {
+      condition     = trimspace(try(each.value.zone_id, "")) != ""
+      error_message = "Set cloudflare_zone_id when providing custom_domains."
+    }
+  }
 }
 
 locals {

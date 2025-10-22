@@ -39,115 +39,50 @@ variable "worker_secrets" {
 }
 
 variable "custom_domains" {
-  description = "Custom domains to attach to the Cloudflare Worker script. Accepts null/[] to disable, a hostname-keyed map, or a list of hostnames/objects that include a hostname."
-  type        = any
-  default     = null
+  description = "List of custom domain hostnames to attach to the Cloudflare Worker script. Set to [] or null to disable."
+  type        = list(string)
+  default     = []
+  nullable    = true
 
   validation {
-    condition = (
-      var.custom_domains == null
-      ? true
-      : (
-        (
-          can(tomap(var.custom_domains))
-          ? alltrue([
-            for hostname, config in tomap(var.custom_domains) :
-            trimspace(hostname) != "" && (
-              try(trimspace(config.zone_id), "") != "" ||
-              try(trimspace(config.zone), "") != "" ||
-              trimspace(hostname) != ""
-            )
-          ])
-          : false
-        ) ||
-        (
-          can(tolist(var.custom_domains))
-          ? alltrue([
-            for entry in tolist(var.custom_domains) :
-            (
-              can(entry.hostname)
-              ? trimspace(try(entry.hostname, "")) != ""
-              : trimspace(try(tostring(entry), "")) != ""
-            )
-          ])
-          : false
-        )
-      )
-    )
-    error_message = "Custom domains must be null, empty, a hostname-keyed map, or a list of hostnames/objects that include a hostname."
+    condition     = var.custom_domains == null || alltrue([for hostname in var.custom_domains : trimspace(hostname) != ""])
+    error_message = "Custom domain hostnames must be non-empty strings."
   }
 }
 
-variable "custom_domain_default_zone" {
-  description = "Default zone name to apply when a custom domain does not specify zone information."
+variable "cloudflare_zone_id" {
+  description = "Cloudflare zone identifier applied to each custom domain hostname."
   type        = string
   default     = null
+
+  validation {
+    condition     = var.cloudflare_zone_id == null || trimspace(var.cloudflare_zone_id) != ""
+    error_message = "cloudflare_zone_id must be a non-empty string when set."
+  }
 }
 
 locals {
-  custom_domain_entries = (
+  custom_domain_hostnames = (
     var.custom_domains == null
     ? []
-    : can(tomap(var.custom_domains))
-    ? [
-      for hostname, config in tomap(var.custom_domains) :
-      {
-        hostname = trimspace(hostname)
-        config   = config
-      }
+    : [
+      for hostname in var.custom_domains :
+      trimspace(hostname)
       if trimspace(hostname) != ""
     ]
-    : can(tolist(var.custom_domains))
-    ? [
-      for entry in tolist(var.custom_domains) :
-      (
-        can(entry.hostname)
-        ? {
-          hostname = trimspace(try(entry.hostname, ""))
-          config   = entry
-        }
-        : {
-          hostname = trimspace(try(tostring(entry), ""))
-          config   = {}
-        }
-      )
-      if(
-        can(entry.hostname)
-        ? trimspace(try(entry.hostname, "")) != ""
-        : trimspace(try(tostring(entry), "")) != ""
-      )
-    ]
-    : []
+  )
+
+  default_custom_domain_zone_id = (
+    trimspace(try(var.cloudflare_zone_id, "")) != ""
+    ? trimspace(var.cloudflare_zone_id)
+    : null
   )
 
   custom_domains = {
-    for entry in local.custom_domain_entries :
-    entry.hostname => {
-      zone_id = (
-        trimspace(try(lookup(entry.config, "zone_id", ""), "")) != ""
-        ? trimspace(try(lookup(entry.config, "zone_id", ""), ""))
-        : null
-      )
-
-      zone = (
-        trimspace(try(lookup(entry.config, "zone", ""), "")) != ""
-        ? trimspace(try(lookup(entry.config, "zone", ""), ""))
-        : (
-          trimspace(try(lookup(entry.config, "zone_id", ""), "")) != ""
-          ? null
-          : (
-            trimspace(try(var.custom_domain_default_zone, "")) != ""
-            ? trimspace(try(var.custom_domain_default_zone, ""))
-            : entry.hostname
-          )
-        )
-      )
-
-      environment = (
-        trimspace(try(lookup(entry.config, "environment", ""), "")) != ""
-        ? trimspace(try(lookup(entry.config, "environment", ""), ""))
-        : null
-      )
+    for hostname in toset(local.custom_domain_hostnames) :
+    hostname => {
+      zone_id     = local.default_custom_domain_zone_id
+      environment = "production"
     }
   }
 }

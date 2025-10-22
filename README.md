@@ -82,9 +82,8 @@ Infrastructure is managed via OpenTofu in the `infra/` directory and executed th
 2. Edit `terraform.tfvars` with your actual values:
    - `cloudflare_account_id` - Your Cloudflare account ID
    - `cloudflare_api_token` - API token with appropriate permissions
-   - `custom_domain_default_zone` - (Optional) Default zone name to apply when hostnames omit zone details
-   - `custom_domains` - Custom domains keyed by hostname or provided as a list of hostnames/objects (set to `{}`, `[]`, or `null` if none)
-     - When supplying a list of hostnames, set `custom_domain_default_zone` to your apex zone (for example `wrimo.io`). Use the map form when you need per-host zone IDs or environments.
+   - `cloudflare_zone_id` - Zone ID that owns the Worker domains (required when `custom_domains` is non-empty)
+   - `custom_domains` - List of hostnames to attach to the Worker (set to `[]` or `null` if none)
 
 3. Initialize and apply:
    ```bash
