@@ -35,6 +35,7 @@ variable "worker_secrets" {
   description = "Secrets to attach to the production Worker environment."
   type        = map(string)
   default     = {}
+  sensitive   = true
 }
 
 variable "custom_domains" {
