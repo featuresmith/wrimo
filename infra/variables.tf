@@ -15,20 +15,28 @@ variable "worker_name" {
   default     = "wrimo"
 }
 
-variable "worker_script" {
-  description = "Initial Worker script content. The deployment pipeline should update this after the script is created."
-  type        = string
-  default     = <<-EOT
-  addEventListener("fetch", event => {
-    event.respondWith(new Response("Wrimo Worker placeholder", { status: 200 }));
-  });
-  EOT
-}
-
 variable "worker_compatibility_date" {
   description = "Cloudflare Workers compatibility date for the Worker."
   type        = string
-  default     = "2024-05-01"
+  default     = "2024-10-11"
+}
+
+variable "worker_main_module_name" {
+  description = "Name of the Worker module that exports the fetch handler."
+  type        = string
+  default     = "index.js"
+}
+
+variable "worker_main_module_path" {
+  description = "Path to the Worker module file relative to the infra directory."
+  type        = string
+  default     = "../worker/index.js"
+}
+
+variable "worker_assets_directory" {
+  description = "Directory containing the static assets to upload with the Worker version."
+  type        = string
+  default     = "../dist"
 }
 
 variable "worker_secrets" {
@@ -48,6 +56,7 @@ variable "custom_domains" {
     condition     = var.custom_domains == null || alltrue([for hostname in var.custom_domains : trimspace(hostname) != ""])
     error_message = "Custom domain hostnames must be non-empty strings."
   }
+
 }
 
 variable "cloudflare_zone_id" {
@@ -56,7 +65,11 @@ variable "cloudflare_zone_id" {
   default     = null
 
   validation {
-    condition     = var.cloudflare_zone_id == null || trimspace(var.cloudflare_zone_id) != ""
+    condition = (
+      var.cloudflare_zone_id == null
+      ? true
+      : trimspace(var.cloudflare_zone_id) != ""
+    )
     error_message = "cloudflare_zone_id must be a non-empty string when set."
   }
 }
@@ -73,16 +86,24 @@ locals {
   )
 
   default_custom_domain_zone_id = (
-    trimspace(try(var.cloudflare_zone_id, "")) != ""
-    ? trimspace(var.cloudflare_zone_id)
-    : null
+    var.cloudflare_zone_id == null
+    ? null
+    : (
+      trimspace(var.cloudflare_zone_id) != ""
+      ? trimspace(var.cloudflare_zone_id)
+      : null
+    )
   )
 
-  custom_domains = {
-    for hostname in toset(local.custom_domain_hostnames) :
-    hostname => {
-      zone_id     = local.default_custom_domain_zone_id
-      environment = "production"
+  custom_domains = (
+    local.default_custom_domain_zone_id == null
+    ? {}
+    : {
+      for hostname in toset(local.custom_domain_hostnames) :
+      hostname => {
+        zone_id     = local.default_custom_domain_zone_id
+        environment = "production"
+      }
     }
-  }
+  )
 }

@@ -1,12 +1,7 @@
 cloudflare_account_id = "00000000000000000000000000000000"
 cloudflare_api_token  = "cf-api-token"
 worker_name           = "wrimo"
-worker_script = <<-EOT
-addEventListener("fetch", event => {
-  event.respondWith(new Response("Wrimo Worker placeholder", { status: 200 }));
-});
-EOT
-worker_compatibility_date = "2024-05-01"
+worker_compatibility_date = "2024-10-11"
 
 worker_secrets = {
   # EXAMPLE_KEY = "value"
@@ -20,3 +15,8 @@ custom_domains = [
   "wrimo.io",
   # "www.wrimo.io",
 ]
+
+# Override these only if the Worker module or build output live in different locations.
+# worker_main_module_name = "index.js"
+# worker_main_module_path = "../worker/index.js"
+# worker_assets_directory = "../dist"
