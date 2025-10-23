@@ -42,7 +42,7 @@ This serves the Worker at http://localhost:8787 using the same bundle the deploy
 
 Deployments are now driven entirely by Spacelift. When changes land on `main`, the Spacelift stack builds the site (`pnpm build`) and then applies the OpenTofu configuration. Terraform uploads the Worker module and static assets through the `cloudflare_worker_version` resource and immediately promotes that version via `cloudflare_workers_deployment`, so no separate Wrangler deployment step is required.
 
-Because Terraform reads the build artifacts directly from `dist/`, always run `pnpm build` before executing `mise run tf-plan` or `mise run tf-apply` locally. Commit the regenerated `dist/` outputs alongside your changes so Spacelift can read the same bundle when it runs `tofu plan` and `tofu apply`.
+Because Terraform reads the build artifacts directly from `dist/`, always run `pnpm build` before executing `mise run tf-plan` or `mise run tf-apply` locally. The directory is intentionally ignored by Git—ensure it exists in your working copy when planning or applying infrastructure changes.
 
 ### Terraform-managed Worker bundle
 
@@ -59,6 +59,15 @@ Configure the Spacelift stack with the following environment variables or contex
 - `CLOUDFLARE_ACCOUNT_ID` – Cloudflare account identifier used by the provider.
 
 Additional secrets (for example Worker secret values) continue to live in Spacelift and flow into Terraform via `worker_secrets`.
+
+Add a pre-plan command (for example in a Spacelift before-plan hook) that installs dependencies and builds the static site so the Terraform run has a fresh `dist/` directory:
+
+```bash
+pnpm install --frozen-lockfile
+pnpm build
+```
+
+Because the artifacts are not committed, each Spacelift run must build them on the fly before invoking OpenTofu.
 
 ### Wrangler manifest for local preview
 
