@@ -42,7 +42,7 @@ This serves the Worker at http://localhost:8787 using the same bundle the deploy
 
 Deployments are now driven entirely by Spacelift. When changes land on `main`, the Spacelift stack builds the site (`pnpm build`) and then applies the OpenTofu configuration. Terraform uploads the Worker module and static assets through the `cloudflare_worker_version` resource and immediately promotes that version via `cloudflare_workers_deployment`, so no separate Wrangler deployment step is required.
 
-Because Terraform reads the build artifacts directly from `dist/`, always run `pnpm build` before executing `mise run tf-plan` or `mise run tf-apply` locally. The Spacelift pipeline performs the same build step automatically before applying.
+Because Terraform reads the build artifacts directly from `dist/`, always run `pnpm build` before executing `mise run tf-plan` or `mise run tf-apply` locally. Commit the regenerated `dist/` outputs alongside your changes so Spacelift can read the same bundle when it runs `tofu plan` and `tofu apply`.
 
 ### Terraform-managed Worker bundle
 
@@ -97,7 +97,7 @@ OpenTofu state is automatically managed by Spacelift. No backend configuration i
 
 ### Spacelift automation
 
-Spacelift runs the OpenTofu stack whenever infrastructure changes are merged to `main`, applying updates to the Worker script container, secrets, and custom domain bindings. Local runs (`mise run tf-plan` / `mise run tf-apply`) remain useful for validation, but the production lifecycle is driven by Spacelift.
+Spacelift runs the OpenTofu stack whenever infrastructure changes are merged to `main`, applying updates to the Worker script container, secrets, and custom domain bindings. Local runs (`mise run tf-plan` / `mise run tf-apply`) remain useful for validation, but the production lifecycle is driven by Spacelift. The `infra/migrations.tf` file removes legacy Worker resources (`cloudflare_workers_domain`, `cloudflare_workers_secret`, and `cloudflare_worker_script`) from state so the upgraded provider can plan cleanly.
 
 ## Contributing
 

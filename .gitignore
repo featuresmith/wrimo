@@ -4,7 +4,6 @@ pnpm-debug.log*
 .pnpm-store/
 
 # Build outputs
-dist/
 dist-ssr/
 *.local
 

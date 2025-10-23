@@ -22,8 +22,11 @@ locals {
 check "custom_domains_require_zone_id" {
   assert {
     condition = (
-      length(local.custom_domains) == 0 ||
-      trimspace(try(var.cloudflare_zone_id, "")) != ""
+      length(local.custom_domain_hostnames) == 0
+      ? true
+      : (
+        var.cloudflare_zone_id != null && trimspace(var.cloudflare_zone_id) != ""
+      )
     )
 
     error_message = "Set cloudflare_zone_id when providing custom_domains."
@@ -75,11 +78,15 @@ resource "cloudflare_workers_custom_domain" "custom" {
   hostname    = each.key
   service     = cloudflare_worker.worker.name
   environment = lookup(each.value, "environment", "production")
-  zone_id     = trimspace(try(each.value.zone_id, ""))
+  zone_id     = each.value.zone_id
 
   lifecycle {
     precondition {
-      condition     = trimspace(try(each.value.zone_id, "")) != ""
+      condition = (
+        each.value.zone_id == null
+        ? false
+        : trimspace(each.value.zone_id) != ""
+      )
       error_message = "Set cloudflare_zone_id when providing custom_domains."
     }
   }

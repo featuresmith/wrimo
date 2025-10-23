@@ -196,7 +196,7 @@ wrimo/
 
 ## Deployment
 
-The site is deployed by Spacelift applying the OpenTofu stack. Terraform uploads the Worker module and static assets via `cloudflare_worker_version`, so merging to `main` automatically promotes the new build once Spacelift finishes running `pnpm build` and `tofu apply`.
+The site is deployed by Spacelift applying the OpenTofu stack. Terraform uploads the Worker module and static assets via `cloudflare_worker_version`, so make sure to run `pnpm build` and commit the regenerated `dist/` directory before opening a PR. Spacelift reads those committed artifacts during `tofu plan`/`tofu apply`, and `infra/migrations.tf` prunes the legacy Worker resources from state during the provider upgrade.
 
 ## Questions?
 

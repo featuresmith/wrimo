@@ -65,7 +65,11 @@ variable "cloudflare_zone_id" {
   default     = null
 
   validation {
-    condition     = var.cloudflare_zone_id == null || trimspace(var.cloudflare_zone_id) != ""
+    condition = (
+      var.cloudflare_zone_id == null
+      ? true
+      : trimspace(var.cloudflare_zone_id) != ""
+    )
     error_message = "cloudflare_zone_id must be a non-empty string when set."
   }
 }
@@ -82,16 +86,24 @@ locals {
   )
 
   default_custom_domain_zone_id = (
-    trimspace(try(var.cloudflare_zone_id, "")) != ""
-    ? trimspace(var.cloudflare_zone_id)
-    : null
+    var.cloudflare_zone_id == null
+    ? null
+    : (
+      trimspace(var.cloudflare_zone_id) != ""
+      ? trimspace(var.cloudflare_zone_id)
+      : null
+    )
   )
 
-  custom_domains = {
-    for hostname in toset(local.custom_domain_hostnames) :
-    hostname => {
-      zone_id     = local.default_custom_domain_zone_id
-      environment = "production"
+  custom_domains = (
+    local.default_custom_domain_zone_id == null
+    ? {}
+    : {
+      for hostname in toset(local.custom_domain_hostnames) :
+      hostname => {
+        zone_id     = local.default_custom_domain_zone_id
+        environment = "production"
+      }
     }
-  }
+  )
 }
