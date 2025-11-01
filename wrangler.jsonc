@@ -15,7 +15,6 @@
 		"not_found_handling": "single-page-application"
 	},
 	// Hyperdrive binding is required - the app requires a database connection
-	// Configure Hyperdrive with your database connection:
 	"hyperdrive": [
 		{
 		  "binding": "HYPERDRIVE",
