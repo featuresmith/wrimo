@@ -26,9 +26,10 @@ if (!import.meta.env.VITE_AUTH0_AUDIENCE) {
 }
 
 // Validate domain format (optional warning)
-const isValidAuth0Domain = /\.(auth0|us\.auth0|eu\.auth0|au\.auth0)\.com$/.test(domain);
+// Note: Custom domains (e.g., join.wrimo.io) are also valid Auth0 domains
+const isValidAuth0Domain = /^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/.test(domain);
 if (!isValidAuth0Domain) {
-	console.warn("Auth0 domain format might be incorrect. Expected format: your-domain.auth0.com");
+	console.warn("Auth0 domain format might be incorrect. Expected format: your-domain.auth0.com or custom domain (e.g., join.wrimo.io)");
 }
 
 const rootElement = document.getElementById("root");

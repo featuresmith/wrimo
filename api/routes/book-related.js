@@ -46,7 +46,7 @@ const verifyJWT = async (c, next) => {
 			throw new Error(
 				"Auth0 domain not configured.\n" +
 				"Create a .dev.vars file (see .dev.vars.example) with:\n" +
-				"  AUTH0_DOMAIN=your-domain.auth0.com\n" +
+				"  AUTH0_DOMAIN=join.wrimo.io\n" +
 				"  AUTH0_AUDIENCE=https://wrimo.io/api/\n" +
 				"\nNote: .env files are NOT loaded into c.env by Cloudflare Workers.\n" +
 				"Use .dev.vars for backend environment variables (it's gitignored)."
