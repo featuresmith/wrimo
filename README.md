@@ -8,7 +8,7 @@
 
 Build a library of books using [Cloudflare Workers Assets](https://developers.cloudflare.com/workers/static-assets/), Hono API routes, and [Cloudflare Hyperdrive](https://developers.cloudflare.com/hyperdrive/) to connect to a PostgreSQL database. [Workers Smart Placement](https://developers.cloudflare.com/workers/configuration/smart-placement/) is enabled to automatically position your Worker closer to your database for reduced latency.
 
-Browse a categorized collection of books in this application. To learn more about a title, click on it to navigate to an expanded view. The collection can also be filtered by genre. If a custom database connection is not provided, a fallback set of books will be used.
+Browse a categorized collection of books in this application. To learn more about a title, click on it to navigate to an expanded view. The collection can also be filtered by genre. A database connection is required to run this application.
 
 If creating a personal database, books are expected to be stored in the following format:
 
@@ -45,11 +45,11 @@ This application uses Cloudflare Workers' [Smart Placement](https://developers.c
 
 - **Backend**: API routes served by a Worker using [Hono](https://hono.dev/)
   - API endpoints defined in `/api/routes` directory
-  - Automatic fallback to mock data when database is unavailable
+  - Requires database connection via Hyperdrive
 
 - **Database**: PostgreSQL database connected via Cloudflare Hyperdrive
   - Smart Placement enabled for optimal performance
-  - Handles missing connection strings or connection failures
+  - Database connection is required - the app will return an error if not configured
 
 ## Get Started
 
@@ -95,9 +95,7 @@ Cloudflare's Hyperdrive is database connector that optimizes queries from your W
    }
    ```
 
-4. **Fallback handling**: This application automatically falls back to mock data if:
-   - Hyperdrive binding is not configured
-   - Database connection fails for any reason
+4. **Database requirement**: This application requires a database connection. If the Hyperdrive binding is not configured or the database connection fails, the application will return an error response.
 
 For a more detailed walkthrough, see the [Hyperdrive documentation](https://developers.cloudflare.com/hyperdrive/configuration/connect-to-postgres/).
 
@@ -139,12 +137,16 @@ There are two different ways to deploy this application: Full Experience and Dem
    ```
 6. Deploy with `npm run deploy`
 
-### Option 2: Without Database (Demo Mode)
+### Option 2: Local Development Only
 
-1. Run `npm i`
-2. Keep the Hyperdrive binding commented out in `wrangler.jsonc` (this is the default)
-3. Deploy with `npm run deploy`
-4. The app will automatically use mock data instead of a real database
+For local development, you can use the Docker setup:
+
+1. Run `docker-compose up -d` to start the PostgreSQL database
+2. Run `npm i`
+3. Configure the Hyperdrive binding in `wrangler.jsonc` with the local connection string
+4. Run `npm run dev` to start the development server
+
+**Note**: A database connection is required for the application to function. There is no demo mode without a database.
 
 ## Resources
 
