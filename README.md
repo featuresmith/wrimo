@@ -57,7 +57,7 @@ To run the applicaton locally, use the Docker container defined in `docker-compo
 
 1. `docker-compose up -d`
    - Creates container with PostgreSQL and seeds it with the data found in `init.sql`
-2. `npm run dev`
+2. `pnpm dev`
 
 If you update `init.sql`, be sure to run `docker-compose down -v` to teardown the previous image.
 
@@ -68,7 +68,7 @@ Cloudflare's Hyperdrive is database connector that optimizes queries from your W
 1. **Create a Hyperdrive configuration**:
 
    ```sh
-   npx wrangler hyperdrive create my-hyperdrive-config --connection-string="postgres://user:password@hostname:port/dbname"
+   pnpm exec wrangler hyperdrive create my-hyperdrive-config --connection-string="postgres://user:password@hostname:port/dbname"
    ```
 
    This command will return the Hyperdrive ID that you'll need for your configuration.
@@ -113,7 +113,7 @@ There are two different ways to deploy this application: Full Experience and Dem
 
 ### Option 1: With Database (Full Experience)
 
-1. Run `npm i`
+1. Run `pnpm install`
 2. Sign up for a PostgreSQL provider and create a database
    - Quickstart options: [Supabase](https://supabase.com/), [Neon](https://neon.tech/)
 3. Load the sample data using the provided SQL script:
@@ -123,7 +123,7 @@ There are two different ways to deploy this application: Full Experience and Dem
      - Or use a command line tool like `psql`: `psql -h hostname -U username -d dbname -f init.sql`
 4. Create a Hyperdrive connection by running:
    ```sh
-   npx wrangler hyperdrive create <YOUR_CONFIG_NAME> --connection-string="<postgres://user:password@HOSTNAME_OR_IP_ADDRESS:PORT/database_name>"
+   pnpm exec wrangler hyperdrive create <YOUR_CONFIG_NAME> --connection-string="<postgres://user:password@HOSTNAME_OR_IP_ADDRESS:PORT/database_name>"
    ```
 5. Uncomment and update the Hyperdrive binding in `wrangler.jsonc` with the ID from step 4:
    ```json
@@ -135,16 +135,16 @@ There are two different ways to deploy this application: Full Experience and Dem
      }
    ]
    ```
-6. Deploy with `npm run deploy`
+6. Deploy with `pnpm deploy`
 
 ### Option 2: Local Development Only
 
 For local development, you can use the Docker setup:
 
 1. Run `docker-compose up -d` to start the PostgreSQL database
-2. Run `npm i`
+2. Run `pnpm install`
 3. Configure the Hyperdrive binding in `wrangler.jsonc` with the local connection string
-4. Run `npm run dev` to start the development server
+4. Run `pnpm dev` to start the development server
 
 **Note**: A database connection is required for the application to function. There is no demo mode without a database.
 
