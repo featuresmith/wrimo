@@ -12,6 +12,7 @@ function App() {
 	const [bookDetail, setBookDetail] = useState(null);
 	const [loading, setLoading] = useState(false);
 	const [genres, setGenres] = useState([]);
+	const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
 	// Get route parameters
 	const { bookId } = params;
@@ -108,9 +109,11 @@ function App() {
 				activeGenre={activeGenre}
 				onSelectGenre={handleSelectGenre}
 				counts
+				isCollapsed={isSidebarCollapsed}
+				onToggle={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
 			/>
 
-			<main className="main-content">
+			<main className={`main-content ${isSidebarCollapsed ? "main-content-expanded" : ""}`}>
 				{/* Breadcrumbs for main library page */}
 				{!bookId && (
 					<Breadcrumbs
