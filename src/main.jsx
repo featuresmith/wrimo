@@ -7,6 +7,7 @@ import App from "./App.jsx";
 
 const domain = import.meta.env.VITE_AUTH0_DOMAIN;
 const clientId = import.meta.env.VITE_AUTH0_CLIENT_ID;
+const audience = import.meta.env.VITE_AUTH0_AUDIENCE || "https://wrimo.io/api/";
 
 // Validate Auth0 configuration
 if (!domain || !clientId) {
@@ -14,11 +15,19 @@ if (!domain || !clientId) {
 	console.error("Required environment variables:");
 	console.error("- VITE_AUTH0_DOMAIN");
 	console.error("- VITE_AUTH0_CLIENT_ID");
+	console.error("Optional (defaults to https://wrimo.io/api/):");
+	console.error("- VITE_AUTH0_AUDIENCE");
 	throw new Error("Auth0 domain and client ID must be set in .env file");
 }
 
-// Validate domain format
-if (!domain.includes('.auth0.com') && !domain.includes('.us.auth0.com') && !domain.includes('.eu.auth0.com') && !domain.includes('.au.auth0.com')) {
+// Warn if audience is not explicitly set (using default)
+if (!import.meta.env.VITE_AUTH0_AUDIENCE) {
+	console.warn("VITE_AUTH0_AUDIENCE not set, using default: https://wrimo.io/api/");
+}
+
+// Validate domain format (optional warning)
+const isValidAuth0Domain = /\.(auth0|us\.auth0|eu\.auth0|au\.auth0)\.com$/.test(domain);
+if (!isValidAuth0Domain) {
 	console.warn("Auth0 domain format might be incorrect. Expected format: your-domain.auth0.com");
 }
 
@@ -34,6 +43,8 @@ createRoot(rootElement).render(
 			clientId={clientId}
 			authorizationParams={{
 				redirect_uri: window.location.origin,
+				audience,
+				scope: "openid profile email offline_access",
 			}}
 			cacheLocation="localstorage"
 			useRefreshTokens={true}

@@ -9,6 +9,7 @@
 	"dependencies": {
 		"@auth0/auth0-react": "^2.8.0",
 		"@tailwindcss/postcss": "4.1.4",
+		"jose": "^5.9.6",
 		"react": "19.0.0",
 		"react-dom": "19.0.0",
 		"react-router": "7.6.3",
@@ -40,9 +41,11 @@
 		"cf-typegen": "wrangler types",
 		"check": "vite build && wrangler deploy --dry-run",
 		"deploy": "wrangler deploy",
+		"predev": "pnpm sync-env",
 		"dev": "vite",
 		"lint": "eslint .",
-		"preview": "vite preview"
+		"preview": "vite preview",
+		"sync-env": "node scripts/sync-env-vars.js"
 	},
 	"type": "module",
 	"pnpm": {

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router";
+import { useAuth0 } from "@auth0/auth0-react";
 import { groupByGenre } from "./lib/utils";
 import Breadcrumbs from "./components/Breadcrumbs";
 import Sidebar from "./components/Sidebar";
@@ -9,14 +10,14 @@ import BookDetail from "./components/BookDetail";
 function App() {
 	const navigate = useNavigate();
 	const params = useParams();
+	const { getAccessTokenSilently } = useAuth0();
 	const [bookDetail, setBookDetail] = useState(null);
 	const [loading, setLoading] = useState(false);
 	const [genres, setGenres] = useState([]);
 	const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
 	// Get route parameters
-	const { bookId } = params;
-	const { genreId } = params;
+	const { bookId, genreId } = params;
 	const activeGenre = genreId ? decodeURIComponent(genreId) : null;
 
 	// Load genres for sidebar
@@ -52,21 +53,28 @@ function App() {
 
 		const fetchBookDetail = async () => {
 			setLoading(true);
+			setBookDetail(null);
+			
 			try {
 				// First get basic book details
 				const bookResponse = await fetch(`/api/books/${bookId}`);
 
 				if (!bookResponse.ok) {
-					throw new Error(`API returned status: ${bookResponse.status}`);
+					throw new Error(`Failed to fetch book: ${bookResponse.status}`);
 				}
 
 				const bookData = await bookResponse.json();
 
-				// Then get related books data
-				const relatedResponse = await fetch(`/api/books/${bookId}/related`);
+				// Then get related books data (protected endpoint)
+				const token = await getAccessTokenSilently();
+				const relatedResponse = await fetch(`/api/books/${bookId}/related`, {
+					headers: {
+						Authorization: `Bearer ${token}`,
+					},
+				});
 
 				if (!relatedResponse.ok) {
-					throw new Error(`API returned status: ${relatedResponse.status}`);
+					throw new Error(`Failed to fetch related books: ${relatedResponse.status}`);
 				}
 
 				const relatedData = await relatedResponse.json();
@@ -82,13 +90,14 @@ function App() {
 				setBookDetail(combinedData);
 			} catch (error) {
 				console.error("Error fetching book details:", error);
+				setBookDetail(null);
 			} finally {
 				setLoading(false);
 			}
 		};
 
 		fetchBookDetail();
-	}, [bookId]);
+	}, [bookId, getAccessTokenSilently]);
 
 	const handleSelectBook = (bookId) => {
 		navigate(`/book/${bookId}`);
@@ -108,7 +117,7 @@ function App() {
 				genres={genres}
 				activeGenre={activeGenre}
 				onSelectGenre={handleSelectGenre}
-				counts
+				counts={true}
 				isCollapsed={isSidebarCollapsed}
 				onToggle={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
 			/>
@@ -150,7 +159,7 @@ function App() {
 						<BookDetail bookData={bookDetail} />
 					) : (
 						<div className="text-center py-20 text-gray-600">
-							Error loading book details
+							Log in to view book details.
 						</div>
 					)
 				) : (
