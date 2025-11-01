@@ -3,6 +3,10 @@
 	"description": "Deploy your own library of books using Postgres and Workers.",
 	"private": true,
 	"packageManager": "pnpm@10.20.0",
+	"engines": {
+		"node": "^24.11.0",
+		"pnpm": "~10.20.0"
+	},
 	"cloudflare": {
 		"label": "React + Postgres Fullstack App",
 		"products": [
