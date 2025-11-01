@@ -2,6 +2,7 @@
 	"name": "cloudflare",
 	"description": "Deploy your own library of books using Postgres and Workers.",
 	"private": true,
+	"packageManager": "pnpm@9",
 	"cloudflare": {
 		"label": "React + Postgres Fullstack App",
 		"products": [
