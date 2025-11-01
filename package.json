@@ -2,7 +2,7 @@
 	"name": "cloudflare",
 	"description": "Deploy your own library of books using Postgres and Workers.",
 	"private": true,
-	"packageManager": "pnpm@9",
+	"packageManager": "pnpm@10.20.0",
 	"cloudflare": {
 		"label": "React + Postgres Fullstack App",
 		"products": [
@@ -57,5 +57,12 @@
 		"lint": "eslint .",
 		"preview": "vite preview"
 	},
-	"type": "module"
+	"type": "module",
+	"pnpm": {
+		"onlyBuiltDependencies": [
+			"esbuild",
+			"sharp",
+			"workerd"
+		]
+	}
 }
