@@ -19,14 +19,24 @@ export default function LoggedInPage() {
 				setLoading(true);
 				setError(null);
 
-				// Calculate start and end of current month
-				const now = new Date();
-				const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-				const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
-
-				// Format dates as ISO 8601 strings
-				const startDate = startOfMonth.toISOString();
-				const endDate = endOfMonth.toISOString();
+			// Calculate start and end of current month based on user's local calendar month
+			// Fix: Avoid timezone conversion shift by using start of next month as exclusive boundary
+			const now = new Date();
+			const year = now.getFullYear();
+			const month = now.getMonth(); // 0-11, represents user's current calendar month
+			
+			// Start of month: Local midnight on the 1st, converted to UTC
+			const startOfMonthLocal = new Date(year, month, 1, 0, 0, 0, 0);
+			const startDate = startOfMonthLocal.toISOString();
+			
+			// End of month: Use start of next month in local time, convert to UTC, subtract 1ms
+			// This avoids the issue where Nov 30 23:59:59 EST -> Dec 1 04:59:59 UTC
+			// By using Dec 1 00:00:00 EST -> Dec 1 05:00:00 UTC, then subtracting 1ms,
+			// we get Dec 1 04:59:59.999 UTC, which correctly represents the end of November
+			const startOfNextMonthLocal = new Date(year, month + 1, 1, 0, 0, 0, 0);
+			const startOfNextMonthUTC = new Date(startOfNextMonthLocal.toISOString());
+			const endOfMonthUTC = new Date(startOfNextMonthUTC.getTime() - 1);
+			const endDate = endOfMonthUTC.toISOString();
 
 				// Get access token
 				const token = await getAccessTokenSilently();
