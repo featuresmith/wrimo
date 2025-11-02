@@ -34,7 +34,7 @@
 		"postcss": "8.5.3",
 		"postgres": "3.4.5",
 		"vite": "^6.0.0",
-		"wrangler": "4.21.x"
+		"wrangler": "4.45.3"
 	},
 	"scripts": {
 		"build": "vite build",
