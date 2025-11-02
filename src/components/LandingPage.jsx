@@ -1,3 +1,5 @@
+import LoginButton from "../LoginButton";
+
 export default function LandingPage() {
 	return (
 		<div className="landing-page">
@@ -7,7 +9,7 @@ export default function LandingPage() {
 					<p className="landing-subtitle">
 						The global writing challenge where the reward is your own book.
 					</p>
-					<p className="coming-soon">Coming Soon</p>
+					<LoginButton />
 				</header>
 
 				<section className="features-section">
