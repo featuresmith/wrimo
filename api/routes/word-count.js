@@ -358,5 +358,69 @@ wordCountRouter.post("/", async (c) => {
 	}
 });
 
+// DELETE endpoint to delete today's word count entries
+wordCountRouter.delete("/today", async (c) => {
+	const sql = c.env.SQL;
+	const user = c.get("user");
+
+	if (!user) {
+		return Response.json(
+			{ error: "User information not found in token." },
+			{ status: 401 }
+		);
+	}
+
+	const auth0Domain = getEnvVar(c, "AUTH0_DOMAIN");
+	const authHeader = c.req.header("Authorization");
+	const token = authHeader?.substring(7); // Extract token for potential fallback
+	
+	const userId = await extractUserId(user, token, auth0Domain);
+	if (!userId) {
+		return Response.json(
+			{ error: "User UUID not found in access token." },
+			{ status: 400 }
+		);
+	}
+
+	try {
+		// Calculate start and end of today in user's local timezone
+		const now = new Date();
+		const year = now.getFullYear();
+		const month = now.getMonth();
+		const day = now.getDate();
+		
+		// Start of today: Local midnight, converted to UTC
+		const startOfTodayLocal = new Date(year, month, day, 0, 0, 0, 0);
+		const startDate = startOfTodayLocal.toISOString();
+		
+		// End of today: Start of tomorrow in local time, convert to UTC, subtract 1ms
+		const startOfTomorrowLocal = new Date(year, month, day + 1, 0, 0, 0, 0);
+		const startOfTomorrowUTC = new Date(startOfTomorrowLocal.toISOString());
+		const endOfTodayUTC = new Date(startOfTomorrowUTC.getTime() - 1);
+		const endDate = endOfTodayUTC.toISOString();
+
+		// Delete all entries for today
+		const result = await sql`
+			DELETE FROM word_count_updates
+			WHERE user_id = ${userId}::uuid
+			AND created_at >= ${startDate}::timestamp with time zone
+			AND created_at <= ${endDate}::timestamp with time zone
+			RETURNING *
+		`;
+
+		return Response.json({
+			success: true,
+			deleted_count: result.length,
+			deleted_entries: result,
+		});
+	} catch (error) {
+		console.error("Error deleting today's word count entries:", error);
+		return Response.json(
+			{ error: "Failed to delete today's word count entries. Please try again." },
+			{ status: 500 }
+		);
+	}
+});
+
 export default wordCountRouter;
 
