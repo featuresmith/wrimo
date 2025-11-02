@@ -2,6 +2,7 @@ import { Hono } from "hono";
 import postgres from "postgres";
 import booksRouter from "./routes/books";
 import bookRelatedRouter from "./routes/book-related";
+import wordCountRouter from "./routes/word-count";
 
 const app = new Hono();
 
@@ -41,6 +42,7 @@ app.use("*", async (c, next) => {
 
 app.route("/api/books", booksRouter);
 app.route("/api/books/:id/related", bookRelatedRouter);
+app.route("/api/word-count", wordCountRouter);
 
 // Catch-all route for static assets
 app.all("*", async (c) => {

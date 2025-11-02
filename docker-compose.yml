@@ -1,18 +1,21 @@
-version: "3.8"
 services:
   db:
-    image: postgres
-    container_name: my_postgres
+    image: cockroachdb/cockroach:latest
+    container_name: my_cockroach
     restart: always
     environment:
-      POSTGRES_USER: myuser
-      POSTGRES_PASSWORD: mypassword
-      POSTGRES_DB: mydatabase
+      COCKROACH_HOST: localhost
+      COCKROACH_PORT: 26258
+      COCKROACH_USER: myuser
+      COCKROACH_PASSWORD: mypassword
+      COCKROACH_DATABASE: mydatabase
+    command: start-single-node --accept-sql-without-tls --http-addr=:8081
     ports:
-      - "5432:5432"
+      - "5432:26257"
+      - "8081:8081" # CockroachDB Admin UI
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - cockroach_data:/cockroach/cockroach-data
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
 
 volumes:
-  postgres_data:
+  cockroach_data:

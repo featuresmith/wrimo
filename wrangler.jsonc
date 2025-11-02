@@ -20,7 +20,7 @@
 		{
 		  "binding": "HYPERDRIVE",
 		  "id": "97f65c897c1e448aab80a85dbac5269c",
-		  "localConnectionString": "postgresql://myuser:mypassword@localhost:5432/mydatabase",
+		  "localConnectionString": "postgresql://myuser:mypassword@localhost:5432/mydatabase?sslmode=disable",
 		},
 	  ],
 	"placement": {

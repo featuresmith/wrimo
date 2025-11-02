@@ -1,3 +1,18 @@
+CREATE TABLE IF NOT EXISTS word_count_updates (
+    id UUID PRIMARY KEY DEFAULT gen_random_ulid(),
+    user_id UUID NOT NULL, -- references app_metadata.uuid from auth0 (custom claim: https://wrimo.io/claims/uuid)
+    created_at TIMESTAMP WITH TIME ZONE,
+    word_count INTEGER NOT NULL CHECK (word_count > 0)
+);
+
+-- Insert a mock word count update
+INSERT INTO word_count_updates (user_id, created_at, word_count)
+VALUES (
+  '2ab25568-b72a-489f-82d7-b53f90f62af9',
+  '2025-11-01 10:30:00+01',
+  1240
+);
+
 -- Create books table if it doesn't exist
 CREATE TABLE IF NOT EXISTS books (
     id SERIAL PRIMARY KEY,
@@ -9,7 +24,6 @@ CREATE TABLE IF NOT EXISTS books (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
-
 
 -- Insert books data with consolidated genres
 INSERT INTO books (id, title, author, description, image_url, genre) VALUES
