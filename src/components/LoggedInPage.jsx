@@ -3,7 +3,7 @@ import { useAuth0 } from "@auth0/auth0-react";
 import LogoutButton from "../LogoutButton";
 
 export default function LoggedInPage() {
-	const { getAccessTokenSilently, isAuthenticated } = useAuth0();
+	const { getAccessTokenSilently, isAuthenticated, user } = useAuth0();
 	const [totalWords, setTotalWords] = useState(null);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(null);
@@ -75,7 +75,14 @@ export default function LoggedInPage() {
 	return (
 		<div className="logged-in-page">
 			<header className="logged-in-header">
-				<h1 className="logged-in-title">Wrimo</h1>
+				<div className="logged-in-title-container">
+					<h1 className="logged-in-title">Wrimo</h1>
+					{user?.name && (
+						<span className="logged-in-user-name">
+							{user.name}
+						</span>
+					)}
+				</div>
 				<LogoutButton className="login-style" />
 			</header>
 			<div className="logged-in-container">
