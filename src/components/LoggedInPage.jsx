@@ -14,6 +14,7 @@ export default function LoggedInPage() {
 	const [submitSuccess, setSubmitSuccess] = useState(null);
 	const [todayWordCount, setTodayWordCount] = useState(null);
 	const loadingTimeoutRef = useRef(null);
+	const isSubmittingRef = useRef(false);
 
 	const fetchTodayWordCount = async () => {
 		if (!isAuthenticated) {
@@ -168,9 +169,11 @@ export default function LoggedInPage() {
 	};
 
 	useEffect(() => {
-		fetchWordCount();
-		fetchTodayWordCount();
-	}, [isAuthenticated, getAccessTokenSilently]);
+		if (isAuthenticated) {
+			fetchWordCount();
+			fetchTodayWordCount();
+		}
+	}, [isAuthenticated]);
 
 	// Cleanup timeout on unmount
 	useEffect(() => {
@@ -183,6 +186,11 @@ export default function LoggedInPage() {
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
+		
+		// Prevent duplicate submissions
+		if (isSubmittingRef.current) {
+			return;
+		}
 		
 		const wordCount = parseInt(wordCountInput, 10);
 		
@@ -203,6 +211,7 @@ export default function LoggedInPage() {
 		const hadPreviousEntry = previousTodayWordCount > 0;
 
 		try {
+			isSubmittingRef.current = true;
 			setSubmitting(true);
 			setShowLoadingText(false);
 			setSubmitError(null);
@@ -261,9 +270,8 @@ export default function LoggedInPage() {
 				throw new Error(errorData.error || `Failed to submit word count: ${response.status}`);
 			}
 
-			// Confirm with server and refresh to ensure consistency
-			// Use silent mode to prevent flashing loading message
-			await Promise.all([fetchWordCount(true), fetchTodayWordCount()]);
+			// State already updated optimistically above - no need to refetch or update again
+			// This avoids extra API requests and ensures UI stays responsive
 
 			// Clear success message after 3 seconds
 			setTimeout(() => {
@@ -284,6 +292,7 @@ export default function LoggedInPage() {
 				clearTimeout(loadingTimeoutRef.current);
 				loadingTimeoutRef.current = null;
 			}
+			isSubmittingRef.current = false;
 			setSubmitting(false);
 			setShowLoadingText(false);
 		}
