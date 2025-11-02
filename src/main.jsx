@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route } from "react-router";
 import { Auth0Provider } from "@auth0/auth0-react";
 import "./index.css";
 import App from "./App.jsx";
+import LandingPage from "./components/LandingPage.jsx";
 
 const domain = import.meta.env.VITE_AUTH0_DOMAIN;
 const clientId = import.meta.env.VITE_AUTH0_CLIENT_ID;
@@ -52,9 +53,10 @@ createRoot(rootElement).render(
 		>
 			<BrowserRouter>
 				<Routes>
-					<Route path="/" element={<App />} />
-					<Route path="/genre/:genreId" element={<App />} />
-					<Route path="/book/:bookId" element={<App />} />
+					<Route path="/" element={<LandingPage />} />
+					<Route path="/app" element={<App />} />
+					<Route path="/app/genre/:genreId" element={<App />} />
+					<Route path="/app/book/:bookId" element={<App />} />
 				</Routes>
 			</BrowserRouter>
 		</Auth0Provider>

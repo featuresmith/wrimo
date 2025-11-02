@@ -47,7 +47,7 @@ function BooksList({ filter, onSelectBook }) {
 	const { books, loading } = useBooks(filter, sortBy);
 
 	const handleBookSelect = (bookId) => {
-		onSelectBook ? onSelectBook(bookId) : navigate(`/book/${bookId}`);
+		onSelectBook ? onSelectBook(bookId) : navigate(`/app/book/${bookId}`);
 	};
 	const handleSortChange = (e) => {
 		setSortBy(e.target.value);

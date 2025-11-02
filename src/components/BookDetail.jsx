@@ -15,14 +15,14 @@ function BookDetail({ bookData }) {
 
 	const handleNavigate = (value) => {
 		if (value === null) {
-			navigate("/");
+			navigate("/app");
 		} else if (value !== "book") {
-			navigate(`/genre/${encodeURIComponent(value)}`);
+			navigate(`/app/genre/${encodeURIComponent(value)}`);
 		}
 	};
 
 	const handleRelatedBookClick = (bookId) => {
-		navigate(`/book/${bookId}`);
+		navigate(`/app/book/${bookId}`);
 	};
 
 	return (
@@ -50,7 +50,7 @@ function BookDetail({ bookData }) {
 									<span
 										className="inline-block border border-blue-800 text-blue-800 text-sm px-3 py-1 rounded-full font-sans cursor-pointer"
 										onClick={() =>
-											navigate(`/genre/${encodeURIComponent(book.genre)}`)
+											navigate(`/app/genre/${encodeURIComponent(book.genre)}`)
 										}
 									>
 										{book.genre}

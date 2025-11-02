@@ -50,7 +50,7 @@ function Sidebar({ genres, activeGenre, counts, isCollapsed, onToggle }) {
 
 					<nav className="sidebar-nav">
 						<Link
-							to="/"
+							to="/app"
 							className={
 								activeGenre === null ? "sidebar-link-active" : "sidebar-link"
 							}
@@ -63,7 +63,7 @@ function Sidebar({ genres, activeGenre, counts, isCollapsed, onToggle }) {
 							{genres.map((genre) => (
 								<Link
 									key={genre.name}
-									to={`/genre/${encodeURIComponent(genre.name)}`}
+									to={`/app/genre/${encodeURIComponent(genre.name)}`}
 									className={
 										activeGenre === genre.name
 											? "sidebar-link-active"

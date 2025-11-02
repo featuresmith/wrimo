@@ -100,14 +100,14 @@ function App() {
 	}, [bookId, getAccessTokenSilently]);
 
 	const handleSelectBook = (bookId) => {
-		navigate(`/book/${bookId}`);
+		navigate(`/app/book/${bookId}`);
 	};
 
 	const handleSelectGenre = (genre) => {
 		if (genre) {
-			navigate(`/genre/${encodeURIComponent(genre)}`);
+			navigate(`/app/genre/${encodeURIComponent(genre)}`);
 		} else {
-			navigate("/");
+			navigate("/app");
 		}
 	};
 
