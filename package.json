@@ -33,7 +33,7 @@
 		"hono": "4.10.3",
 		"postcss": "8.5.3",
 		"postgres": "3.4.5",
-		"vite": "^6.0.0",
+		"vite": "^6.4.5",
 		"wrangler": "4.45.3"
 	},
 	"scripts": {
